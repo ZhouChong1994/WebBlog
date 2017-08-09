@@ -10,43 +10,73 @@
             border: 1px solid #d9dce0;
             margin: 10px auto;
         }
+
+        #btn {
+            padding: 10px;
+            margin: 0 auto;
+            background: #337ab7;
+            float: left;
+            color: #ffffff;
+        }
     </style>
 </head>
 <body>
+<div id="btn" onclick="getUserMedia();">本地视频</div>
 <div id="video">
-    <video src="" id="local_video" autoplay></video>
+    <video  id="local_video" autoplay></video>
 </div>
 </body>
 <script type="text/javascript">
-    navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
 
-    if (navigator.getUserMedia) {
+    function constraints() {
+        var mW = 320;
+        var mH = 240;
         var constraint = {
             video: true,
             audio: true,
+            width: {mix: 160, max: mW},
+            height: {mix: 120, max: mH}
         };
-        navigator.getUserMedia(constraint, (stream) => {
-
-            var v = document.getElementById('local_video');
-
-            if (window.URL) {
-                v.src = window.URL.createObjectURL(stream);
-            }
-            else {
-                video.src = stream;
-            }
-
-            v.onloadedmetadata = function (e) {
-                v.play();
-            };
-            console.log('stream' + stream);
-            console.log("Label: " + stream.id);
-            console.log("AudioTracks", stream.getAudioTracks());
-            console.log("VideoTracks", stream.getVideoTracks());
-
-        }, (error) => {
-            console.log('failed')
-        })
+        return constraint;
     }
+
+    function getUserMedia() {
+        navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+        var constraint = constraints();
+        if (navigator.mediaDevices.getUserMedia && navigator.mediaDevices) {
+            navigator.mediaDevices.getUserMedia(constraint).then((stream) => {
+                handleMedia(stream);
+            })['catch']((error) => {
+                console.log('error')
+            })
+        }
+        else if (navigator.getUserMedia) {
+            navigator.getUserMedia(constraint, (stream) => {
+                handleMedia(stream);
+            }, (error) => {
+                console.log('failed')
+            })
+        }
+    }
+
+    function handleMedia(stream) {
+        var v = document.getElementById('local_video');
+
+        if (window.URL) {
+            v.src = window.URL.createObjectURL(stream);
+        }
+        else {
+            video.src = stream;
+        }
+
+        v.onloadedmetadata = function (e) {
+            v.play();
+        };
+        console.log('stream' + stream);
+        console.log("Label: " + stream.id);
+        console.log("AudioTracks", stream.getAudioTracks());
+        console.log("VideoTracks", stream.getVideoTracks());
+    }
+
 </script>
 </html>
