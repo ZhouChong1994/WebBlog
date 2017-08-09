@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>H5 webRTC</title>
+    <style>
+        #video {
+            width: 500px;
+            height: 500px;
+            border: 1px solid #d9dce0;
+            margin: 10px auto;
+        }
+    </style>
+</head>
+<body>
+<div id="video">
+    <video src="" id="local_video" autoplay></video>
+</div>
+</body>
+<script type="text/javascript">
+    navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+
+    if (navigator.getUserMedia) {
+        var constraint = {
+            video: true,
+            audio: true,
+        };
+        navigator.getUserMedia(constraint, (stream) => {
+
+            var v = document.getElementById('local_video');
+
+            if (window.URL) {
+                v.src = window.URL.createObjectURL(stream);
+            }
+            else {
+                video.src = stream;
+            }
+
+            v.onloadedmetadata = function (e) {
+                v.play();
+            };
+            console.log('stream' + stream);
+            console.log("Label: " + stream.id);
+            console.log("AudioTracks", stream.getAudioTracks());
+            console.log("VideoTracks", stream.getVideoTracks());
+
+        }, (error) => {
+            console.log('failed')
+        })
+    }
+</script>
+</html>
